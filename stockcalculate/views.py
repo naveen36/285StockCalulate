@@ -19,7 +19,8 @@ from pprint import pprint
 from pymongo import MongoClient
 
 def addStock(request):
-	return render_to_response("stockcalculate/invest/add-stock.html")
+	return render_to_response("stockcalculate/portfolio/oldindex.html")
+
 
 
 
@@ -81,20 +82,25 @@ def portfolio(request):
 	current_value=portDay1-investedAm
 	print dayData
 
+	strArr=[]
+	username=request.GET["username"]
+	with open('investment-strategy/strategy-stock.json') as data_file:
+		data = json.load(data_file)
+
+	print data["Investment Strategies"]
 
 
 
-
-	return render_to_response("stockcalculate/portfolio/portfolio.html",{'username':username,'name':name,'count':count,'dayData':dayData,'investedAm':investedAm, 'current_value':current_value})
+	return render_to_response("stockcalculate/portfolio/newport.html",{'data':data["Investment Strategies"],'username':username,'name':name,'count':count,'dayData':dayData,'investedAm':investedAm, 'current_value':current_value})
 
 
 def marketHome(request):
 	ethi_stock=[]
 	ethi_num=[]
-	
+
 	grow_stock=[]
 	grow_num=[]
-	
+
 	ind_stock=[]
 	ind_num=[]
 
@@ -137,12 +143,12 @@ def marketHome(request):
 			val_num.append(str(element["portion"]))
 		print val_stock
 		print val_num
-		
+
 
 		appl_stock=[]
 		appl_val=[]
 
-		
+
 
 		with open('investment-strategy/WIKI-AAPL.csv', 'rU') as csvfile:
 			spamreader = csv.reader(csvfile, delimiter=',', quotechar='|',lineterminator='\r')
@@ -200,17 +206,17 @@ def investStock(request):
 @csrf_exempt
 def addstrategy(request):
 	client = MongoClient('localhost', 27017)
-	
+
 	username=request.GET["username"]
 	amount=int(request.POST["amount"])
 	print amount
 	strategy=request.POST["strategy"]
 	ethi_stock=[]
 	ethi_num=[]
-	
+
 	grow_stock=[]
 	grow_num=[]
-	
+
 	ind_stock=[]
 	ind_num=[]
 
@@ -271,7 +277,7 @@ def addstrategy(request):
 				json_data=json.loads(r.text)
 				today_price=int(json_data["dataset"]["data"][0][1])
 				count=int(tamount/today_price)
-				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(ethi_stock[i]),"count":count,"price":today_price}}})	
+				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(ethi_stock[i]),"count":count,"price":today_price}}})
 				db=client.analytical_285
 				collection1=db.stockdata
 				collection2=db.strategydata
@@ -287,7 +293,7 @@ def addstrategy(request):
 						print "test1"
 				if not x:
 					db.stockdata.insert({"name":str(ethi_stock[i]),"investment":tamount})
-					print "test2"		
+					print "test2"
 
 			search=db.strategydata.find({"name":strategy})
 			x=False
@@ -304,28 +310,295 @@ def addstrategy(request):
 					print "hello1"
 			if not x:
 				db.strategydata.insert({"name":"Ethical Investing" ,"investment":amount})
-				print "hello2"		
+				print "hello2"
 
 		elif strategy=="Growth Investing":
-			grow_stock=[]
-			grow_num=[]	
+			for i in range(len(grow_stock)):
+				db = client.operational_285
+				collection = db.userdata
+				tamount=(int(amount)*int(grow_num[i]))/100
+				today_date=datetime.today().strftime('%Y-%m-%d')
+				date_N_days_ago = datetime.now() - timedelta(days=3)
+				old_date= date_N_days_ago.strftime('%Y-%m-%d')
+				print old_date
+				print today_date
+				print grow_stock[i]
 
-	
+				url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(grow_stock[i])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+				#https://www.quandl.com/api/v3/datasets/WIKI/EBAY.json?column_index=4&start_date=2017-12-14&end_date=2017-12-17&api_key=UerxA7FX2e_owB_Y5Esg
+				r = requests.get(url, stream=True)
+				json_data=json.loads(r.text)
+				today_price=int(json_data["dataset"]["data"][0][1])
+				count=int(tamount/today_price)
+				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(grow_stock[i]),"count":count,"price":today_price}}})
+				db=client.analytical_285
+				collection1=db.stockdata
+				collection2=db.strategydata
+				search=db.stockdata.find({"name":str(grow_stock[i])})
+				x=False
+				for abc in search:
+					x=True
+					print abc["name"]
+					if str(abc["name"])==str(grow_stock[i]):
+						intialvalue=int(abc["investment"])
+						tamount=intialvalue+tamount
+						db.stockdata.update({"name":str(grow_stock[i])},{"$set":{"investment":tamount}})
+						print "test1"
+				if not x:
+					db.stockdata.insert({"name":str(grow_stock[i]),"investment":tamount})
+					print "test2"
+
+			search=db.strategydata.find({"name":strategy})
+			x=False
+			print amount
+			for abc in search:
+				x=True
+				print abc["name"]
+				if str(abc["name"])==str(strategy):
+					intialvalue=int(abc["investment"])
+					print intialvalue
+					amount=int(intialvalue)+int(amount)
+					print amount
+					db.strategydata.update({"name":"Growth Investing"},{"$set":{"investment":amount}})
+					print "hello1"
+			if not x:
+				db.strategydata.insert({"name":"Growth Investing" ,"investment":amount})
+				print "hello2"
+			# grow_stock=[]
+			# grow_num=[]
+
+
 		elif strategy=="Index Investing":
-			ind_stock=[]
-			ind_num=[]
+			for i in range(len(ind_stock)):
+				db = client.operational_285
+				collection = db.userdata
+				tamount=(int(amount)*int(ind_num[i]))/100
+				today_date=datetime.today().strftime('%Y-%m-%d')
+				date_N_days_ago = datetime.now() - timedelta(days=3)
+				old_date= date_N_days_ago.strftime('%Y-%m-%d')
+				print old_date
+				print today_date
+				print ind_stock[i]
+
+				url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(ind_stock[i])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+				#https://www.quandl.com/api/v3/datasets/WIKI/EBAY.json?column_index=4&start_date=2017-12-14&end_date=2017-12-17&api_key=UerxA7FX2e_owB_Y5Esg
+				r = requests.get(url, stream=True)
+				json_data=json.loads(r.text)
+				today_price=int(json_data["dataset"]["data"][0][1])
+				count=int(tamount/today_price)
+				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(ind_stock[i]),"count":count,"price":today_price}}})
+				db=client.analytical_285
+				collection1=db.stockdata
+				collection2=db.strategydata
+				search=db.stockdata.find({"name":str(ind_stock[i])})
+				x=False
+				for abc in search:
+					x=True
+					print abc["name"]
+					if str(abc["name"])==str(ind_stock[i]):
+						intialvalue=int(abc["investment"])
+						tamount=intialvalue+tamount
+						db.stockdata.update({"name":str(ind_stock[i])},{"$set":{"investment":tamount}})
+						print "test1"
+				if not x:
+					db.stockdata.insert({"name":str(ind_stock[i]),"investment":tamount})
+					print "test2"
+
+			search=db.strategydata.find({"name":strategy})
+			x=False
+			print amount
+			for abc in search:
+				x=True
+				print abc["name"]
+				if str(abc["name"])==str(strategy):
+					intialvalue=int(abc["investment"])
+					print intialvalue
+					amount=int(intialvalue)+int(amount)
+					print amount
+					db.strategydata.update({"name":"Index Investing"},{"$set":{"investment":amount}})
+					print "hello1"
+			if not x:
+				db.strategydata.insert({"name":"Index Investing" ,"investment":amount})
+				print "hello2"
+			#ind_stock=[]
+			#ind_num=[]
+
 
 		elif strategy=="Quality Investing":
-			qua_stock=[]
-			qua_num=[]
+			for i in range(len(qua_stock)):
+				db = client.operational_285
+				collection = db.userdata
+				tamount=(int(amount)*int(qua_num[i]))/100
+				today_date=datetime.today().strftime('%Y-%m-%d')
+				date_N_days_ago = datetime.now() - timedelta(days=3)
+				old_date= date_N_days_ago.strftime('%Y-%m-%d')
+				print old_date
+				print today_date
+				print qua_stock[i]
+
+				url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(qua_stock[i])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+				#https://www.quandl.com/api/v3/datasets/WIKI/EBAY.json?column_index=4&start_date=2017-12-14&end_date=2017-12-17&api_key=UerxA7FX2e_owB_Y5Esg
+				r = requests.get(url, stream=True)
+				json_data=json.loads(r.text)
+				today_price=int(json_data["dataset"]["data"][0][1])
+				count=int(tamount/today_price)
+				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(qua_stock[i]),"count":count,"price":today_price}}})
+				db=client.analytical_285
+				collection1=db.stockdata
+				collection2=db.strategydata
+				search=db.stockdata.find({"name":str(qua_stock[i])})
+				x=False
+				for abc in search:
+					x=True
+					print abc["name"]
+					if str(abc["name"])==str(qua_stock[i]):
+						intialvalue=int(abc["investment"])
+						tamount=intialvalue+tamount
+						db.stockdata.update({"name":str(qua_stock[i])},{"$set":{"investment":tamount}})
+						print "test1"
+				if not x:
+					db.stockdata.insert({"name":str(qua_stock[i]),"investment":tamount})
+					print "test2"
+
+			search=db.strategydata.find({"name":strategy})
+			x=False
+			print amount
+			for abc in search:
+				x=True
+				print abc["name"]
+				if str(abc["name"])==str(strategy):
+					intialvalue=int(abc["investment"])
+					print intialvalue
+					amount=int(intialvalue)+int(amount)
+					print amount
+					db.strategydata.update({"name":"Quality Investing"},{"$set":{"investment":amount}})
+					print "hello1"
+			if not x:
+				db.strategydata.insert({"name":"Quality Investing" ,"investment":amount})
+				print "hello2"
+			#qua_stock=[]
+			#qua_num=[]
 
 		elif strategy=="Value Investing":
-			val_stock=[]
-			val_num=[]
-		
+			for i in range(len(val_stock)):
+				db = client.operational_285
+				collection = db.userdata
+				tamount=(int(amount)*int(val_num[i]))/100
+				today_date=datetime.today().strftime('%Y-%m-%d')
+				date_N_days_ago = datetime.now() - timedelta(days=3)
+				old_date= date_N_days_ago.strftime('%Y-%m-%d')
+				print old_date
+				print today_date
+				print val_stock[i]
 
-	return render_to_response("stockcalculate/addedStrategy.html",{'username':username})
-	
+				url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(val_stock[i])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+				#https://www.quandl.com/api/v3/datasets/WIKI/EBAY.json?column_index=4&start_date=2017-12-14&end_date=2017-12-17&api_key=UerxA7FX2e_owB_Y5Esg
+				r = requests.get(url, stream=True)
+				json_data=json.loads(r.text)
+				today_price=int(json_data["dataset"]["data"][0][1])
+				count=int(tamount/today_price)
+				db.userdata.update({"username":username},{"$push":{"stocks":{"name":str(val_stock[i]),"count":count,"price":today_price}}})
+				db=client.analytical_285
+				collection1=db.stockdata
+				collection2=db.strategydata
+				search=db.stockdata.find({"name":str(val_stock[i])})
+				x=False
+				for abc in search:
+					x=True
+					print abc["name"]
+					if str(abc["name"])==str(val_stock[i]):
+						intialvalue=int(abc["investment"])
+						tamount=intialvalue+tamount
+						db.stockdata.update({"name":str(val_stock[i])},{"$set":{"investment":tamount}})
+						print "test1"
+				if not x:
+					db.stockdata.insert({"name":str(val_stock[i]),"investment":tamount})
+					print "test2"
+
+			search=db.strategydata.find({"name":strategy})
+			x=False
+			print amount
+			for abc in search:
+				x=True
+				print abc["name"]
+				if str(abc["name"])==str(strategy):
+					intialvalue=int(abc["investment"])
+					print intialvalue
+					amount=int(intialvalue)+int(amount)
+					print amount
+					db.strategydata.update({"name":"Value Investing"},{"$set":{"investment":amount}})
+					print "hello1"
+			if not x:
+				db.strategydata.insert({"name":"Value Investing" ,"investment":amount})
+				print "hello2"
+			#val_stock=[]
+			#val_num=[]
+	username=request.GET["username"]
+	print username
+	name=[]
+	count=[]
+	Client = MongoClient("localhost:27017")
+	db = Client["operational_285"]
+	userData = db.userdata.find({"username": username})
+	print userData
+	today_date=datetime.today().strftime('%Y-%m-%d')
+	date_N_days_ago = datetime.now() - timedelta(days=10)
+	old_date= date_N_days_ago.strftime('%Y-%m-%d')
+	portDay1=0
+	portDay2=0
+	portDay3=0
+	portDay4=0
+	portDay5=0
+	investedAm=0
+
+	dayData=[]
+
+
+
+	for allStockData in userData:
+		for Stockname in allStockData["stocks"]:
+			name.append(str(Stockname["name"]))
+			count.append(Stockname["count"])
+			url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(Stockname["name"])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+			r = requests.get(url, stream=True)
+			json_data=json.loads(r.text)
+			day5_price=float(json_data["dataset"]["data"][4][1])
+			day4_price=float(json_data["dataset"]["data"][3][1])
+			day3_price=float(json_data["dataset"]["data"][2][1])
+			day2_price=float(json_data["dataset"]["data"][1][1])
+			day1_price=float(json_data["dataset"]["data"][0][1])
+			count_current=int(Stockname["count"])
+			investedAm+=count_current*int(Stockname["price"])
+			portDay5+=count_current*day5_price
+			portDay4+=count_current*day4_price
+			portDay3+=count_current*day3_price
+			portDay2+=count_current*day2_price
+			portDay1+=count_current*day1_price
+
+
+	dayData.append(int(portDay5))
+	dayData.append(int(portDay4))
+	dayData.append(int(portDay3))
+	dayData.append(int(portDay2))
+	dayData.append(int(portDay1))
+
+	current_value=portDay1-investedAm
+	print dayData
+
+	strArr=[]
+	username=request.GET["username"]
+	with open('investment-strategy/strategy-stock.json') as data_file:
+		data = json.load(data_file)
+
+	print data["Investment Strategies"]
+
+
+
+	return render_to_response("stockcalculate/portfolio/newport.html",{'data':data["Investment Strategies"],'username':username,'name':name,'count':count,'dayData':dayData,'investedAm':investedAm, 'current_value':current_value})
+
+
+#	return render_to_response("stockcalculate/addedStrategy.html",{'username':username})
+
 
 @csrf_exempt
 def addData(request):
@@ -344,7 +617,7 @@ def addData(request):
 	json_data=json.loads(r.text)
 	today_price=float(json_data["dataset"]["data"][0][1])
 	count=int(total_investment/today_price)
-	db.userdata.update({"username":username},{"$push":{"stocks":{"name":stockname,"count":count,"price":today_price}}})	
+	db.userdata.update({"username":username},{"$push":{"stocks":{"name":stockname,"count":count,"price":today_price}}})
 	db=client.analytical_285
 	collection1=db.stockdata
 	collection2=db.strategydata
@@ -360,8 +633,8 @@ def addData(request):
 			print "test1"
 	if not x:
 		db.stockdata.insert({"name":stockname,"investment":total_investment})
-		print "test2"		
-	
+		print "test2"
+
 	return render_to_response("stockcalculate/addedStocks.html",{'username':username})
 
 
@@ -381,11 +654,11 @@ def getValue(request):
 	if float(initial_share_price) <0:
 		raise Exception('Error:', 'Initial Share Price should not be negative')
 	data=collection.find_one({"username":username})
-	db.userdata.update({"username":username},{"$push":{"stocks":{"name":stock_symbol,"count":allotment,"price":initial_share_price}}})	
+	db.userdata.update({"username":username},{"$push":{"stocks":{"name":stock_symbol,"count":allotment,"price":initial_share_price}}})
 	db=client.analytical_285
 	collection1=db.stockdata
 	collection2=db.strategydata
-	
+
 	search=db.stockdata.find({"name":stock_symbol})
 	x=False
 	for abc in search:
@@ -399,12 +672,12 @@ def getValue(request):
 
 
 	return render_to_response("stockcalculate/profitReport.html",{'username':username})
-	
+
 @csrf_exempt
 def login(request):
 	connection = sqlite3.connect('login.db')
 	cursor=connection.cursor()
-	login_user_name=request.GET['loginname']
+	login_user_name=request.GET['username']
 	login_user_password=request.GET['loginpassword']
 	cursor.execute('SELECT Username from login where Username = ?',(login_user_name,))
 	try:
@@ -416,7 +689,65 @@ def login(request):
 		cursor.execute('SELECT Password from login where Username = ?',(login_user_name,))
 		pwd=cursor.fetchall()[0][0]
 		if (login_user_password==pwd):
-			return render_to_response("stockcalculate/login.html",{'username':login_user_name})
+			username=request.GET["username"]
+			print username
+			name=[]
+			count=[]
+			Client = MongoClient("localhost:27017")
+			db = Client["operational_285"]
+			userData = db.userdata.find({"username": username})
+			print userData
+			today_date=datetime.today().strftime('%Y-%m-%d')
+			date_N_days_ago = datetime.now() - timedelta(days=10)
+			old_date= date_N_days_ago.strftime('%Y-%m-%d')
+			portDay1=0
+			portDay2=0
+			portDay3=0
+			portDay4=0
+			portDay5=0
+			investedAm=0
+
+			dayData=[]
+
+
+
+			for allStockData in userData:
+				for Stockname in allStockData["stocks"]:
+					name.append(str(Stockname["name"]))
+					count.append(Stockname["count"])
+					url='https://www.quandl.com/api/v3/datasets/WIKI/'+str(Stockname["name"])+'.json?column_index=4&start_date='+str(old_date)+'&end_date='+str(today_date)+'&api_key=UerxA7FX2e_owB_Y5Esg'
+					r = requests.get(url, stream=True)
+					json_data=json.loads(r.text)
+					day5_price=float(json_data["dataset"]["data"][4][1])
+					day4_price=float(json_data["dataset"]["data"][3][1])
+					day3_price=float(json_data["dataset"]["data"][2][1])
+					day2_price=float(json_data["dataset"]["data"][1][1])
+					day1_price=float(json_data["dataset"]["data"][0][1])
+					count_current=int(Stockname["count"])
+					investedAm+=count_current*int(Stockname["price"])
+					portDay5+=count_current*day5_price
+					portDay4+=count_current*day4_price
+					portDay3+=count_current*day3_price
+					portDay2+=count_current*day2_price
+					portDay1+=count_current*day1_price
+
+
+			dayData.append(int(portDay5))
+			dayData.append(int(portDay4))
+			dayData.append(int(portDay3))
+			dayData.append(int(portDay2))
+			dayData.append(int(portDay1))
+
+			current_value=portDay1-investedAm
+			print dayData
+
+			strArr=[]
+			username=request.GET["username"]
+			with open('investment-strategy/strategy-stock.json') as data_file:
+				data = json.load(data_file)
+			print data["Investment Strategies"]
+			return render_to_response("stockcalculate/portfolio/newport.html",{'data':data["Investment Strategies"],'username':username,'name':name,'count':count,'dayData':dayData,'investedAm':investedAm, 'current_value':current_value})
+
 		elif (login_user_password!=pwd):
 			return render_to_response("stockcalculate/failure.html")
 		# print usr
@@ -477,18 +808,18 @@ def change(request):
 
 def getComma(f):
     s = str(abs(f))
-    decimalposition = s.find(".") 
+    decimalposition = s.find(".")
     if decimalposition == -1:
         decimalposition = len(s)
-    comma_to_number = "" 
-    for i in range(decimalposition+1, len(s)): 
+    comma_to_number = ""
+    for i in range(decimalposition+1, len(s)):
         if not (i-decimalposition-1) % 3 and i-decimalposition-1: comma_to_number = comma_to_number+","
-        comma_to_number = comma_to_number+s[i]      
+        comma_to_number = comma_to_number+s[i]
     if len(comma_to_number):
-        comma_to_number = "."+comma_to_number 
+        comma_to_number = "."+comma_to_number
     for i in range(decimalposition-1,-1,-1):
         if not (decimalposition-i-1) % 3 and decimalposition-i-1: comma_to_number = ","+comma_to_number
-        comma_to_number = s[i]+comma_to_number      
+        comma_to_number = s[i]+comma_to_number
     if f < 0:
         comma_to_number = "-"+comma_to_number
     return comma_to_number

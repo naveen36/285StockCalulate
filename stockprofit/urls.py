@@ -40,12 +40,12 @@ url(r'market$',marketHome,name='marketHome'),
 url(r'invest$',investHome,name='investHome'),
     url(r'investstock$',investStock,name='investStock'),
     url(r'investstrategy$',investStrategy,name='investMoney'),
-    url(r'addstock$',addStock,name='addStock'), #Invest Pre-existing Stock
+    url(r'addstock$',addStock,name='portfolio'), #Invest Pre-existing Stock
 
 #TREND
      url(r'trend$',trendHome,name='trendHome'), #Investment Trends taken from whole of MongoDB
 
-    
+
 
     url(r'getvalue$',getValue,name='getValue'),
     url(r'adddata$',addData,name='addData'),

@@ -21,65 +21,49 @@
     "portion": "20"
   }],
   "Growth Investing": [{
-    "name": "BIIN",
+    "name": "EBAY",
     "portion": "20"
   }, {
-    "name": "AVGO",
+    "name": "MSFT",
+    "portion": "30"
+  }, {
+    "name": "INTC",
     "portion": "20"
   }, {
-    "name": "NFLX",
-    "portion": "20"
-  }, {
-    "name": "IMAX",
-    "portion": "20"
-  }, {
-    "name": "SFM",
-    "portion": "20"
+    "name": "AMZN",
+    "portion": "10"
   }],
   "Index Investing": [{
-    "name": "VTI",
+    "name": "IBM",
+    "portion": "20"
+  }, {
+    "name": "TWTR",
     "portion": "30"
   }, {
-    "name": "IXUS",
-    "portion": "30"
+    "name": "CDNS",
+    "portion": "20"
   }, {
-    "name": "ILTB",
-    "portion": "30"
-  }, {
-    "name": "^GSPC",
+    "name": "SNPS",
     "portion": "10"
   }],
   "Quality Investing": [{
-    "name": "EME",
+    "name": "FB",
+    "portion": "20"
+  }, {
+    "name": "WMT",
     "portion": "30"
   }, {
-    "name": "TSN",
-    "portion": "30"
-  }, {
-    "name": "ENS",
-    "portion": "30"
-  }, {
-    "name": "CVG",
-    "portion": "10"
-  }],
+    "name": "CRM",
+    "portion": "20"
+  }], 
   "Value Investing": [{
-    "name": "FDC",
+    "name": "TSLA",
     "portion": "10"
   }, {
-    "name": "TMUS",
-    "portion": "10"
-  }, {
-    "name": "HCA",
-    "portion": "30"
-  }, {
-    "name": "EXPE",
+    "name": "PYPL",
     "portion": "10"
   }, {
     "name": "FDX",
-    "portion": "10"
-  }, {
-    "name": "CVS",
     "portion": "30"
   }]
-
 }
