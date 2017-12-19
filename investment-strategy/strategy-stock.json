@@ -12,11 +12,8 @@
     "portion": "20"
   }, {
     "name": "NKE",
-    "portion": "20"
-  }, {
-    "name": "JCI",
-    "portion": "10"
-  }, {
+    "portion": "30"
+  },{
     "name": "GOOG",
     "portion": "20"
   }],
@@ -31,11 +28,11 @@
     "portion": "20"
   }, {
     "name": "AMZN",
-    "portion": "10"
+    "portion": "30"
   }],
   "Index Investing": [{
     "name": "IBM",
-    "portion": "20"
+    "portion": "40"
   }, {
     "name": "TWTR",
     "portion": "30"
@@ -51,19 +48,25 @@
     "portion": "20"
   }, {
     "name": "WMT",
-    "portion": "30"
+    "portion": "25"
   }, {
+    "name": "JCI",
+    "portion": "30"
+  },{
     "name": "CRM",
-    "portion": "20"
+    "portion": "25"
   }], 
   "Value Investing": [{
     "name": "TSLA",
-    "portion": "10"
+    "portion": "25"
   }, {
+    "name": "JCI",
+    "portion": "25"
+  },{
     "name": "PYPL",
-    "portion": "10"
+    "portion": "35"
   }, {
     "name": "FDX",
-    "portion": "30"
+    "portion": "15"
   }]
 }

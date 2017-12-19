@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.conf.urls import include
-from stockcalculate.views import getValue,investStrategy,addData,homepage,login,portfolio,marketHome,addstrategy, investHome,trendHome,addStock,investStock,register,change,forgot
+from stockcalculate.views import homepage,login,portfolio,addstrategy,register,forgot
 
 
 urlpatterns = [
@@ -24,29 +24,12 @@ urlpatterns = [
     url(r'^$',homepage,name='homepage'), #Homepage of Website
     url(r'login$',login,name='login'), #Logged in user Home
     url(r'signup$',register,name='register'),
-    url(r'forgot$',forgot,name='forgot'),
-    url(r'change$',change,name='change'),
     url(r'addstrategy$',addstrategy,name='addstrategy'),
+    url(r'forgot$',forgot,name='forgot'),
 
 #PORTFOLIO
 #url(r'portfolio/(?P<username>[\w\-]+)/$',portfolio,name='portfolio'),
 url(r'portfolio$',portfolio,name='portfolio'),
 
-#MARKET
-url(r'market$',marketHome,name='marketHome'),
 
-
-#INVEST
-url(r'invest$',investHome,name='investHome'),
-    url(r'investstock$',investStock,name='investStock'),
-    url(r'investstrategy$',investStrategy,name='investMoney'),
-    url(r'addstock$',addStock,name='portfolio'), #Invest Pre-existing Stock
-
-#TREND
-     url(r'trend$',trendHome,name='trendHome'), #Investment Trends taken from whole of MongoDB
-
-
-
-    url(r'getvalue$',getValue,name='getValue'),
-    url(r'adddata$',addData,name='addData'),
 ]

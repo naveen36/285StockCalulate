@@ -49,7 +49,7 @@
             <a class="nav-link js-scroll-trigger" href="#services">Login/Signup</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#portfolio">Team</a>
+            <a class="nav-link js-scroll-trigger" href="#team">Team</a>
           </li>
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
@@ -125,8 +125,17 @@
           </label></div>
           <input style="width:40%;margin-bottom:10px;" type="password" name="password1" id="password1" required autocomplete="off"/>
           </div>
+          {% if signup %}
+          <a style="margin-left:30px;" href=""><small>Signup Succesful. Please Login</small></a><br>
+          {% endif %}
+          {% if userexists%}
+          <a style="margin-left:30px;" href=""><small>Username already taken. Please register with a new username</small></a><br>
+          {% endif %}
+          {% if signupfalse%}
+          <a style="margin-left:30px;" href=""><small>Passwords do not mach. Please check the entered credentials</small></a><br>
+          {% endif %}
           <div class="container text-center">
-          <button class="btn btn-light btn-xl js-scroll-trigger" type="submit" class="button button-block"/>Signup</button>
+          <button style="margin-top:10px;" class="btn btn-light btn-xl js-scroll-trigger" type="submit" class="button button-block"/>Signup</button>
           </div>
 
         </form>
@@ -153,13 +162,17 @@
 
           <div style="margin-top:10px;" class="field-wrap">
           </div>
+          {% if anchor%}
+          <a href=""><small>No account with matching records found. Please check the credentials or Signup</small></a><br>
+          {% endif %}
           <a href="/forgot" action="/forgot"><small>Forgot Password?</small></a>
+          
           <center><button class="btn btn-light btn-xl js-scroll-trigger" name="submit" type="submit" class="button button-block"/>Log In</button></center><br/>
         </form>
       </div>
     </div>
   </section>
-<section class="bg-primary">
+<section class="bg-primary" id="team">
   <div class="container text-center">
     <h2 class="text-faded mb-4">The Team!</h2>
     <h5 class="text-faded mb-4">Prabhu Tej </h5>
@@ -196,6 +209,9 @@
 <!-- Bootstrap core JavaScript -->
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+{% if anchor or signup or signupfalse or userexists%}
+  <script type="text/javascript"> location.hash = 'services' </script>
+{% endif %}
 
 <!-- Plugin JavaScript -->
 <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -204,6 +220,7 @@
 
 <!-- Custom scripts for this template -->
 <script src="js/creative.min.js"></script>
+
 
 </body>
 

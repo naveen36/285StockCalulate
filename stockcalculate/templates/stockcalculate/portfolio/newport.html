@@ -37,16 +37,7 @@
 
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <style type="text/css">
-    #container, #sliders {
-    min-width: 310px;
-    max-width: 800px;
-    margin: 0 auto;
-    }
-    #container {
-    height: 400px;
-    }
-    </style>
+    
 
     </head>
 
@@ -60,8 +51,6 @@
     dayCount.push(Number(dayData[j]))
     }
 
-    console.log(dayCount);
-
 
     </script>
 
@@ -73,7 +62,7 @@
             text: 'Portfolio Value'
         },
         xAxis: {
-            categories: ['Day 1', 'Day 2', 'Day 3', 'Yesterday', 'Today']
+            categories: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5']
         },
         labels: {
             items: [{
@@ -89,11 +78,9 @@
     enabled: false
     },
         series: [{
-            type: 'column',
             name: 'Portfolio Value',
             data: dayCount
         }, {
-            type: 'spline',
             name: 'Trend',
             data: dayCount,
             marker: {
@@ -104,10 +91,61 @@
         }]
     });
     });
-
-
     </script>
 
+    <script type="text/javascript">
+          var stock_name = {{ stock_name | safe }};
+          var stock_percent = {{ stock_percent  | safe }};
+          $(function () {
+          Highcharts.chart('container3', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Distribution of the Investment Strategy'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        legend: {
+            align:'center'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Share',
+            colorByPoint: true,
+            data: [{
+              name: stock_name[0],
+              y: stock_percent[0]
+            }, {
+              name: stock_name[1],
+              y: stock_percent[1]
+            }, {
+              name: stock_name[2],
+              y: stock_percent[2]
+            }, {
+              name: stock_name[3],
+              y: stock_percent[3]
+          }]
+        }]
+    });
+  });
+    </script>
 
     <script type="text/javascript">
     var stock_name = {{ name | safe }};
@@ -120,8 +158,6 @@
     sName.push(stock_name[i])
     sCount.push(stock_count[i])
     }
-    console.log(sCount)
-    console.log(sName)
 
     $(function () {
 
@@ -155,7 +191,7 @@
         },
         series: [{
             name: 'Number of Stocks',
-            color:(Highcharts.theme && Highcharts.theme.textColor) || 'green',
+            color:(Highcharts.theme && Highcharts.theme.textColor),
             data: sCount
         }]
     });
@@ -179,6 +215,7 @@
     <link href="{% static 'vendor/magnific-popup/magnific-popup.css' %}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
+    
     {% load staticfiles %}
     <link href="{% static 'css/creative.min.css' %}" rel="stylesheet">
 
@@ -189,6 +226,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
       <div class="container">
+        {% load staticfiles %}
+        <a class="navbar-brand js-scroll-trigger" href="{% url 'homepage' %}">Home</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" href={homepage} aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
         <a class="navbar-brand js-scroll-trigger" href="#page-top">{{username}}'s Dashboard</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -201,59 +243,47 @@
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#services">Investment Strategies</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#contact">Help</a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
 
-
-    <section class="bg-primary" id="about">
+  {% if investedAm > 0 %}
+  <section class="bg-primary text-center">
+      <div class="container" align="center">
+        <h2 class="text-faded mb-4">Welome to the Portfolio!</h2>
+      </div>
+    </section>
+    <br>
+    {% if strategyset %}
+        <div class="container">
+          <div class="chart"><div id="container3"></div></div>
+        </div>
+  {% endif %}
+    <section id="about">
       <div class="container">
-        <div class="row">
           <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
             <!-- Include all compiled plugins (below), or include individual files as needed -->
 
             <script src="https://code.highcharts.com/highcharts.js"></script>
             <script src="https://code.highcharts.com/modules/exporting.js"></script>
-
-
-
-
-          <div class="container-fluid">
-            <div class="content">
-          <h4>
-          Amount Invested = {{investedAm}}
-
-          </h4>
-
-          <div class="row">
-            <div class="col-md-6">
-              <div class="row">
-                <div class="col-md-12">
-
-                </div>
-              </div>
-
-
-              <div class="row">
-                <div class="chart"><div id="container"></div></div>
-              </div>
+            <div class="container text-center">
+              <h4 >
+                Total Investment : ${{investedAm}}
+              </h4>
             </div>
-
-            <div class="col-md-6 gutter-fix">
-              <div class="row">
-                <div class="col-md-12">
-
-                </div>
+            <div class="row">
+              <div class="col-md-6">
+                  <div class="chart"><div id="container"></div></div>
               </div>
-              <div class="row">
-                <div class="chart"><div id="container2"></div></div>
+              
+              <div class="col-md-6 gutter-fix">
+                  <div class="chart"><div id="container2"></div></div>
               </div>
-            </div>
-
-          </div>
-          </div>
           </div>
 
           <script>
@@ -270,9 +300,32 @@
                 $(window).trigger('resize');
             });
           </script>
-        </div>
       </div>
     </section>
+   
+   
+    <!-- Old Graph - moved to upper section
+    <section id = "graph2">
+     
+     <div class="col-md-6 gutter-fix">
+              <div class="row">
+                <div class="col-md-12">
+
+                </div>
+              </div>
+              <div class="row">
+                <div class="chart"><div id="container2"></div></div>
+              </div>
+            </div>
+
+    </section>-->
+  {% else %}
+    <section class="bg-primary" id="about">
+      <div class="container" align ="center">
+        <h2 class="text-faded mb-4">Welome to the Dashboard. Please invest to check portfolio</h2>
+      </div>
+    </section>
+    {% endif %}
 
     <section class = "bg-dark text-white" id="services">
       <div class="container text-center">
@@ -291,7 +344,7 @@
             <div class="col-md-6">
             <fieldset>
               <h4>
-            Amount to Invest in USD
+            Investment in USD
           </h4>
 
             <input type="text" name="amount" id="amount" style="margin-bottom:10px;margin-top:10px">
@@ -311,108 +364,16 @@
             </form>
           </div>
           <div class="col-md-6">
-            <h1 align="center"> Select Your Investment Strategy</h2>
+            <div class="col-lg-8 mx-auto text-center">
+              <br><br>
+              <h2 align="center"> Select Your Investment Strategy</h2>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="p-0" id="portfolio">
-      <div class="container-fluid p-0">
-        <div class="row no-gutters popup-gallery">
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/1.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/1.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/2.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/2.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/3.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/3.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/4.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/4.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/5.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/5.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <a class="portfolio-box" href="img/portfolio/fullsize/6.jpg">
-              <img class="img-fluid" src="img/portfolio/thumbnails/6.jpg" alt="">
-              <div class="portfolio-box-caption">
-                <div class="portfolio-box-caption-content">
-                  <div class="project-category text-faded">
-                    Category
-                  </div>
-                  <div class="project-name">
-                    Project Name
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+    
 
 
 
@@ -428,6 +389,29 @@
 
     <!-- Custom scripts for this template -->
     <script src="js/creative.min.js"></script>
+    <section id="contact">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h2 class="section-heading">Help</h2>
+        <hr class="my-4">
+        <p class="mb-5">Any investment related queries or account support? Feel free to reach us!</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 ml-auto text-center">
+        <i class="fa fa-phone fa-3x mb-3 sr-contact"></i>
+        <p>408-123-4223</p>
+      </div>
+      <div class="col-lg-4 mr-auto text-center">
+        <i class="fa fa-envelope-o fa-3x mb-3 sr-contact"></i>
+        <p>
+          <a href="mailto:your-email@your-domain.com">support@stocksuggestions.com</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
   </body>
 
