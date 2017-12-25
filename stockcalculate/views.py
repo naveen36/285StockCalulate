@@ -422,18 +422,20 @@ def login(request):
 	try:
 		usr=cursor.fetchall()[0][0]
 	except Exception as inst:
-		return render_to_response("stockcalculate/failure.html")
+		return render_to_response("index.html",{'anchor':True})
 
 	if (login_user_name==usr):
 		cursor.execute('SELECT Password from login where Username = ?',(login_user_name,))
 		pwd=cursor.fetchall()[0][0]
 		if (login_user_password==pwd):
 			username=request.GET["username"]
+			print username
 			name=[]
 			count=[]
 			Client = MongoClient("localhost:27017")
 			db = Client["operational_285"]
 			userData = db.userdata.find({"username": username})
+			print userData
 			today_date=datetime.today().strftime('%Y-%m-%d')
 			date_N_days_ago = datetime.now() - timedelta(days=10)
 			old_date= date_N_days_ago.strftime('%Y-%m-%d')
@@ -476,17 +478,20 @@ def login(request):
 			dayData.append(int(portDay1))
 
 			current_value=portDay1-investedAm
+			print dayData
 
 			strArr=[]
 			username=request.GET["username"]
 			with open('investment-strategy/strategy-stock.json') as data_file:
 				data = json.load(data_file)
+			print data["Investment Strategies"]
 			return render_to_response("stockcalculate/portfolio/newport.html",{'data':data["Investment Strategies"],'username':username,'name':name,'count':count,'dayData':dayData,'investedAm':investedAm, 'current_value':current_value})
 
 		elif (login_user_password!=pwd):
-			return render_to_response("stockcalculate/failure.html")
+			return render_to_response("index.html",{'anchor':True})
+		# print usr
 	elif (login_user_name!=usr):
-		return render_to_response("stockcalculate/failure.html")
+		return render_to_response("index.html",{'anchor':True})
 
 def register(request):
 	client = MongoClient('localhost', 27017)
